@@ -19,7 +19,7 @@ gulp.task('vm2html', function() {
 
 #### vmRootpath
 - Type: `String`
-- Required: `false`
+- Required: `true`
 - Default: [file.base](https://github.com/wearefractal/glob2base)
 
 If setting, it would be jion to `process.cwd()`.
