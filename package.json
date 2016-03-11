@@ -1,0 +1,41 @@
+{
+  "name": "gulp-vm2html",
+  "description": "Render velocity templates.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": {
+    "name": "calledt",
+    "email": "huanggengtao@gmail.com",
+    "url": "calledt.com"
+  },
+  "repository": "calledt/gulp-vm2html",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "velocity",
+    "template",
+    "gulpplugin",
+    "template",
+    "compile",
+    "html",
+    "render",
+    "rendering"
+  ],
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "dependencies": {
+    "gulp-match": "^0.2.1",
+    "gulp-util": "^3.0.6",
+    "through2": "^2.0.0",
+    "velocity": "^0.7.2"
+  },
+  "devDependencies": {
+    "gulp-data": "^1.0.2",
+    "mocha": "*"
+  }
+}
