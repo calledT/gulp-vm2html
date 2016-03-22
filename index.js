@@ -10,12 +10,12 @@ var PluginError = gutil.PluginError;
 // Consts
 const PLUGIN_NAME = 'gulp-vm2html';
 
-function getMock(vmPath, vmRootpath, mockRootpath) {
+function getMock(vmPath, vmRootpath, mockRootpath, mockExtname) {
   if (mockRootpath) {
     vmPath = path.join(process.cwd(), mockRootpath, vmPath.replace(vmRootpath, ''));
   }
 
-  var mockPath = gutil.replaceExtension(vmPath, '.js');
+  var mockPath = gutil.replaceExtension(vmPath, mockExtname);
   if (fs.existsSync(mockPath)) {
     return mockPath;
   } else {
@@ -52,6 +52,10 @@ module.exports = function(opt) {
       return;
     }
 
+    if (!opt.mockExtname) {
+      opt.mockExtname = '.js';
+    }
+
     var config = {
       encoding: opt.encoding || 'utf8',
       root: path.join(process.cwd(), opt.vmRootpath),
@@ -60,11 +64,11 @@ module.exports = function(opt) {
     };
 
     opt.verbose && console.log(PLUGIN_NAME + ' rendering template: ' + file.path);
-    var context = getMock(file.path, path.join(process.cwd(), opt.vmRootpath), opt.mockRootpath);
+    var context = getMock(file.path, path.join(process.cwd(), opt.vmRootpath), opt.mockRootpath, opt.mockExtname);
     var result = new Engine(config).render(context);
 
     file.contents = new Buffer(result);
-    file.path = gutil.replaceExtension(file.path, opt.outputExt || '.html');
+    file.path = gutil.replaceExtension(file.path, '.html');
 
     this.push(file);
     cb();

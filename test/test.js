@@ -55,6 +55,23 @@ it('should use mockRootpath', function(cb) {
   stream.end();
 });
 
+it('should use mockExtname', function(cb) {
+  var stream = velocity({vmRootpath: 'test/vm', mockRootpath: 'test/mock', mockExtname: '.json'});
+
+  stream.on('data', function(data) {
+    assert.equal(data.contents.toString(), 'mockExtname');
+  });
+
+  stream.on('end', cb);
+
+  stream.write(new gutil.File({
+    path: path.join(__dirname, 'vm/foo.vm'),
+    contents: new Buffer('$name')
+  }));
+
+  stream.end();
+});
+
 it('should exclude file', function(cb) {
   var stream = velocity({vmRootPath: 'test/vm', exclude: '**/foo.vm'});
 

@@ -32,10 +32,11 @@ If setting, it would be jion to `process.cwd()`.
 Mock data's name must same to template. If mockRootpath is ignore, mock data should stay beside the template, otherwise it should place in mockbase folder
 with template's folder structure.
 
-#### outputExt
+#### mockExtname
 - Type: `String`
 - Required: `false`
-- Default `.html`
+- Default: '.js'
+
 
 #### macro 
 - Type: `String`
@@ -51,6 +52,7 @@ The condition parameter is any of the conditions supported by [gulp-match](https
 
 #### encoding
 - Type: `String`
+- Required: `false`
 - Default: `utf-8`
 
 
