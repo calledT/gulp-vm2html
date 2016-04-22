@@ -4,105 +4,128 @@ var gutil = require('gulp-util');
 var path = require('path');
 var velocity = require('../');
 
-it('should compile with mock', function(cb) {
-  var stream = velocity({vmRootpath: 'test/vm'});
+describe('gulp-vm2html', function() {
 
-  stream.on('data', function(data) {
-    assert.equal(data.contents.toString(), 'foo');
+  it('should compile with mock', function(done) {
+    var stream = velocity({vmRootpath: 'test/vm'});
+
+    stream.on('data', function(data) {
+      assert.equal(data.contents.toString(), 'foo');
+    });
+
+    stream.on('end', done);
+
+    stream.write(new gutil.File({
+      path: path.join(__dirname, 'vm/foo.vm'),
+      contents: new Buffer('$name')
+    }));
+
+    stream.end();
   });
 
-  stream.on('end', cb);
+  it('should compile without mock', function(done) {
+    var stream = velocity({vmRootpath: 'test/vm'});
 
-  stream.write(new gutil.File({
-    path: path.join(__dirname, 'vm/foo.vm'),
-    contents: new Buffer('$name')
-  }));
+    stream.on('data', function(data) {
+      assert.equal(data.contents.toString(), '$name');
+    });
 
-  stream.end();
-});
+    stream.on('end', done);
 
-it('should compile without mock', function(cb) {
-  var stream = velocity({vmRootpath: 'test/vm'});
+    stream.write(new gutil.File({
+      path: path.join(__dirname, 'vm/baz.vm'),
+      contents: new Buffer('$name')
+    }));
 
-  stream.on('data', function(data) {
-    assert.equal(data.contents.toString(), '$name');
+    stream.end();
   });
 
-  stream.on('end', cb);
+  it('should use mockRootpath', function(done) {
+    var stream = velocity({vmRootpath: 'test/vm', mockRootpath: 'test/mock'});
 
-  stream.write(new gutil.File({
-    path: path.join(__dirname, 'vm/baz.vm'),
-    contents: new Buffer('$name')
-  }));
+    stream.on('data', function(data) {
+      assert.equal(data.contents.toString(), 'mockRootpath');
+    });
 
-  stream.end();
-});
+    stream.on('end', done);
 
-it('should use mockRootpath', function(cb) {
-  var stream = velocity({vmRootpath: 'test/vm', mockRootpath: 'test/mock'});
+    stream.write(new gutil.File({
+      path: path.join(__dirname, 'vm/foo.vm'),
+      contents: new Buffer('$name')
+    }));
 
-  stream.on('data', function(data) {
-    assert.equal(data.contents.toString(), 'mockRootpath');
+    stream.end();
   });
 
-  stream.on('end', cb);
+  it('should use mockExtname', function(done) {
+    var stream = velocity({vmRootpath: 'test/vm', mockRootpath: 'test/mock', mockExtname: '.json'});
 
-  stream.write(new gutil.File({
-    path: path.join(__dirname, 'vm/foo.vm'),
-    contents: new Buffer('$name')
-  }));
+    stream.on('data', function(data) {
+      assert.equal(data.contents.toString(), 'mockExtname');
+    });
 
-  stream.end();
-});
+    stream.on('end', done);
 
-it('should use mockExtname', function(cb) {
-  var stream = velocity({vmRootpath: 'test/vm', mockRootpath: 'test/mock', mockExtname: '.json'});
+    stream.write(new gutil.File({
+      path: path.join(__dirname, 'vm/foo.vm'),
+      contents: new Buffer('$name')
+    }));
 
-  stream.on('data', function(data) {
-    assert.equal(data.contents.toString(), 'mockExtname');
+    stream.end();
   });
 
-  stream.on('end', cb);
+  it('should exclude file', function(done) {
+    var stream = velocity({vmRootPath: 'test/vm', exclude: '**/foo.vm'});
 
-  stream.write(new gutil.File({
-    path: path.join(__dirname, 'vm/foo.vm'),
-    contents: new Buffer('$name')
-  }));
+    stream.on('data', function(data) {
+      assert.equal(data.contents.toString(), '');
+    });
 
-  stream.end();
-});
+    stream.on('end', done);
 
-it('should exclude file', function(cb) {
-  var stream = velocity({vmRootPath: 'test/vm', exclude: '**/foo.vm'});
+    stream.write(new gutil.File({
+      path: path.join(__dirname, 'vm/foo.vm'),
+      contents: new Buffer('$name')
+    }));
 
-  stream.on('data', function(data) {
-    assert.equal(data.contents.toString(), '');
+    stream.end();
   });
 
-  stream.on('end', cb);
+  it('should compile with #parse directive', function(done) {
+    var stream = velocity({vmRootpath: 'test/vm'});
 
-  stream.write(new gutil.File({
-    path: path.join(__dirname, 'vm/foo.vm'),
-    contents: new Buffer('$name')
-  }));
+    stream.on('data', function(data) {
+      assert.equal(data.contents.toString(), 'foo\nfoo');
+    });
 
-  stream.end();
-});
+    stream.on('end', done);
 
-it('should compile with #parse directive', function(cb) {
-  var stream = velocity({vmRootpath: 'test/vm'});
+    stream.write(new gutil.File({
+      path: path.join(__dirname, 'vm/foo.vm'),
+      contents: new Buffer('#parse("bar.vm")$name')
+    }));
 
-  stream.on('data', function(data) {
-    assert.equal(data.contents.toString(), 'foo\nfoo');
+    stream.end();
   });
 
-  stream.on('end', cb);
+  it('should emit errors correctly', function(done) {
+    var stream = velocity({vmRootpath: 'test/vm', mockRootpath: 'test/mock'});
 
-  stream.write(new gutil.File({
-    path: path.join(__dirname, 'vm/foo.vm'),
-    contents: new Buffer('#parse("bar.vm")$name')
-  }));
+    stream.on('error', function(err) {
+      assert.equal(err.message, 'Unexpected token }');
+      done();
+    })
 
-  stream.end();
-});
+    stream.on('data', function(data) {
+      throw new Error('no file should have been emitted!');
+    });
+
+    stream.write(new gutil.File({
+      path: path.join(__dirname, 'vm/error.vm'),
+      contents: new Buffer('$!{name}')
+    }));
+
+    stream.end();
+  });
+})
 
