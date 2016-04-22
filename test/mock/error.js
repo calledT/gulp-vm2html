@@ -1,5 +1,5 @@
 var mock = {
-  name, 'mockRootpath'
+  name: 'mockRootpath';
 };
 
 module.exports = mock;

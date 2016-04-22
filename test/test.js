@@ -1,5 +1,5 @@
 'use strict';
-var assert = require('assert');
+var should = require('should');
 var gutil = require('gulp-util');
 var path = require('path');
 var velocity = require('../');
@@ -10,7 +10,7 @@ describe('gulp-vm2html', function() {
     var stream = velocity({vmRootpath: 'test/vm'});
 
     stream.on('data', function(data) {
-      assert.equal(data.contents.toString(), 'foo');
+      data.contents.toString().should.equal('foo');
     });
 
     stream.on('end', done);
@@ -27,7 +27,7 @@ describe('gulp-vm2html', function() {
     var stream = velocity({vmRootpath: 'test/vm'});
 
     stream.on('data', function(data) {
-      assert.equal(data.contents.toString(), '$name');
+      data.contents.toString().should.equal('$name');
     });
 
     stream.on('end', done);
@@ -44,7 +44,7 @@ describe('gulp-vm2html', function() {
     var stream = velocity({vmRootpath: 'test/vm', mockRootpath: 'test/mock'});
 
     stream.on('data', function(data) {
-      assert.equal(data.contents.toString(), 'mockRootpath');
+      data.contents.toString().should.equal('mockRootpath');
     });
 
     stream.on('end', done);
@@ -61,7 +61,7 @@ describe('gulp-vm2html', function() {
     var stream = velocity({vmRootpath: 'test/vm', mockRootpath: 'test/mock', mockExtname: '.json'});
 
     stream.on('data', function(data) {
-      assert.equal(data.contents.toString(), 'mockExtname');
+      data.contents.toString().should.equal('mockExtname');
     });
 
     stream.on('end', done);
@@ -78,7 +78,7 @@ describe('gulp-vm2html', function() {
     var stream = velocity({vmRootPath: 'test/vm', exclude: '**/foo.vm'});
 
     stream.on('data', function(data) {
-      assert.equal(data.contents.toString(), '');
+      data.contents.toString().should.equal('');
     });
 
     stream.on('end', done);
@@ -95,7 +95,7 @@ describe('gulp-vm2html', function() {
     var stream = velocity({vmRootpath: 'test/vm'});
 
     stream.on('data', function(data) {
-      assert.equal(data.contents.toString(), 'foo\nfoo');
+      data.contents.toString().should.equal('foo\nfoo');
     });
 
     stream.on('end', done);
@@ -108,11 +108,11 @@ describe('gulp-vm2html', function() {
     stream.end();
   });
 
-  it('should emit errors correctly', function(done) {
+  it('should emit mock file errors correctly', function(done) {
     var stream = velocity({vmRootpath: 'test/vm', mockRootpath: 'test/mock'});
 
     stream.on('error', function(err) {
-      assert.equal(err.message, 'Unexpected token }');
+      err.message.should.containEql('Unexpected token');
       done();
     })
 
@@ -123,6 +123,26 @@ describe('gulp-vm2html', function() {
     stream.write(new gutil.File({
       path: path.join(__dirname, 'vm/error.vm'),
       contents: new Buffer('$!{name}')
+    }));
+
+    stream.end();
+  });
+
+  it('should emit velocity file errors correctly', function(done) {
+    var stream = velocity({vmRootpath: 'test/vm'});
+
+    stream.on('error', function(err) {
+      err.message.should.containEql('Param of #parse not exists or is not subpath of root.');
+      done();
+    })
+
+    stream.on('data', function(data) {
+      throw new Error('no file should have been emitted!');
+    });
+
+    stream.write(new gutil.File({
+      path: path.join(__dirname, 'vm/error.vm'),
+      contents: new Buffer('#parse("vm/notexist.vm")')
     }));
 
     stream.end();
