@@ -56,22 +56,29 @@ module.exports = function(opt) {
       opt.mockExtname = '.js';
     }
 
+    var data;
+    var str = file.contents.toString('utf8');
+    var rootpath = path.join(process.cwd(), opt.vmRootpath);
+    var context = getMock(file.path, rootpath, opt.mockRootpath, opt.mockExtname);
+
     var config = {
       encoding: opt.encoding || 'utf8',
-      root: path.join(process.cwd(), opt.vmRootpath),
+      root: rootpath,
       macro: opt.macro,
-      template: String(file.contents)
+      template: str
     };
 
-    opt.verbose && console.log(PLUGIN_NAME + ' rendering template: ' + file.path);
-    var context = getMock(file.path, path.join(process.cwd(), opt.vmRootpath), opt.mockRootpath, opt.mockExtname);
-    var result = new Engine(config).render(context);
+    try {
+      opt.verbose && console.log(PLUGIN_NAME + ' rendering template: ' + file.path);
+      data = new Engine(config).render(context);
+    } catch (err) {
+      return cb(new PluginError(PLUGIN_NAME, err));
+    }
 
-    file.contents = new Buffer(result);
+    file.contents = new Buffer(data);
     file.path = gutil.replaceExtension(file.path, '.html');
 
-    this.push(file);
-    cb();
+    cb(null, file);
   }
 
   return through.obj(transform);
