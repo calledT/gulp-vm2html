@@ -11,11 +11,12 @@ var PluginError = gutil.PluginError;
 const PLUGIN_NAME = 'gulp-vm2html';
 
 function getMock(vmPath, vmRootpath, mockRootpath, mockExtname) {
-  if (mockRootpath) {
-    vmPath = path.join(process.cwd(), mockRootpath, vmPath.replace(vmRootpath, ''));
-  }
 
-  var mockPath = gutil.replaceExtension(vmPath, mockExtname);
+  var mockPath = gutil.replaceExtension(
+    mockRootpath ? vmPath.replace(vmRootpath, mockRootpath) : vmPath,
+    mockExtname
+  );
+
   if (fs.existsSync(mockPath)) {
     return mockPath;
   } else {
@@ -58,12 +59,11 @@ module.exports = function(opt) {
 
     var data;
     var str = file.contents.toString('utf8');
-    var rootpath = path.join(process.cwd(), opt.vmRootpath);
-    var context = getMock(file.path, rootpath, opt.mockRootpath, opt.mockExtname);
+    var context = getMock(file.path, opt.vmRootpath, opt.mockRootpath, opt.mockExtname);
 
     var config = {
       encoding: opt.encoding || 'utf8',
-      root: rootpath,
+      root: opt.vmRootpath,
       macro: opt.macro,
       template: str
     };

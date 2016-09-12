@@ -20,14 +20,12 @@ gulp.task('vm2html', function() {
 #### vmRootpath
 - Type: `String`
 - Required: `true`
-- Default: [file.base](https://github.com/wearefractal/glob2base)
 
-If setting, it would be jion to `process.cwd()`.
 
 #### mockRootpath
 - Type: `String`
 - Required: `false`
-- Default: Same to Velocity template
+- Default: Same to vmRootpath
 
 Mock data's name must same to template. If mockRootpath is ignore, mock data should stay beside the template, otherwise it should place in mockbase folder
 with template's folder structure.

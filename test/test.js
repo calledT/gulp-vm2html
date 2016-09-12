@@ -7,7 +7,7 @@ var velocity = require('../');
 describe('gulp-vm2html', function() {
 
   it('should compile with mock', function(done) {
-    var stream = velocity({vmRootpath: 'test/vm'});
+    var stream = velocity({vmRootpath: path.resolve(__dirname, 'vm')});
 
     stream.on('data', function(data) {
       data.contents.toString().should.equal('foo');
@@ -24,7 +24,7 @@ describe('gulp-vm2html', function() {
   });
 
   it('should compile without mock', function(done) {
-    var stream = velocity({vmRootpath: 'test/vm'});
+    var stream = velocity({vmRootpath: path.resolve(__dirname, 'vm')});
 
     stream.on('data', function(data) {
       data.contents.toString().should.equal('$name');
@@ -41,7 +41,10 @@ describe('gulp-vm2html', function() {
   });
 
   it('should use mockRootpath', function(done) {
-    var stream = velocity({vmRootpath: 'test/vm', mockRootpath: 'test/mock'});
+    var stream = velocity({
+      vmRootpath: path.resolve(__dirname, 'vm'),
+      mockRootpath: path.resolve(__dirname, 'mock')
+    });
 
     stream.on('data', function(data) {
       data.contents.toString().should.equal('mockRootpath');
@@ -58,7 +61,11 @@ describe('gulp-vm2html', function() {
   });
 
   it('should use mockExtname', function(done) {
-    var stream = velocity({vmRootpath: 'test/vm', mockRootpath: 'test/mock', mockExtname: '.json'});
+    var stream = velocity({
+      vmRootpath: path.resolve(__dirname, 'vm'),
+      mockRootpath: path.resolve(__dirname, 'mock'),
+      mockExtname: '.json'
+    });
 
     stream.on('data', function(data) {
       data.contents.toString().should.equal('mockExtname');
@@ -75,7 +82,10 @@ describe('gulp-vm2html', function() {
   });
 
   it('should exclude file', function(done) {
-    var stream = velocity({vmRootPath: 'test/vm', exclude: '**/foo.vm'});
+    var stream = velocity({
+      vmRootPath: path.resolve(__dirname, 'vm'),
+      exclude: '**/foo.vm'
+    });
 
     stream.on('data', function(data) {
       data.contents.toString().should.equal('');
@@ -92,7 +102,7 @@ describe('gulp-vm2html', function() {
   });
 
   it('should compile with #parse directive', function(done) {
-    var stream = velocity({vmRootpath: 'test/vm'});
+    var stream = velocity({vmRootpath: path.resolve(__dirname, 'vm')});
 
     stream.on('data', function(data) {
       data.contents.toString().should.equal('foo\nfoo');
@@ -109,7 +119,10 @@ describe('gulp-vm2html', function() {
   });
 
   it('should emit mock file errors correctly', function(done) {
-    var stream = velocity({vmRootpath: 'test/vm', mockRootpath: 'test/mock'});
+    var stream = velocity({
+      vmRootpath: path.resolve(__dirname, 'vm'),
+      mockRootpath: path.resolve(__dirname, 'mock')
+    });
 
     stream.on('error', function(err) {
       err.message.should.containEql('Unexpected token');
@@ -129,7 +142,7 @@ describe('gulp-vm2html', function() {
   });
 
   it('should emit velocity file errors correctly', function(done) {
-    var stream = velocity({vmRootpath: 'test/vm'});
+    var stream = velocity({vmRootpath: path.resolve(__dirname, 'vm')});
 
     stream.on('error', function(err) {
       err.message.should.containEql('Param of #parse not exists or is not subpath of root.');
