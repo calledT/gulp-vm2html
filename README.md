@@ -8,7 +8,7 @@ var vm2html = require('gulp-vm2html');
 
 gulp.task('vm2html', function() {
 	var stream = gulp.src('src/vm/**/*.vm')
-			.pipe(vm2html({vmRootpath: 'src/vm'}))
+			.pipe(vm2html({vmRootpath: __dirname + '/src/vm'}))
 			.pipe(gulp.dest('src/html'));
 
 	return stream;
